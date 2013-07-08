@@ -9,6 +9,7 @@ The node has the following main features:
 * **Crawler**: the node can crawl (using [breadth first search]) the P2P network and discover the peers and their topology.
 * **Web Frontend**: view live stats of the node and the topology produced by the crawler.
 * **Auto discovery of the node's external IP** useful when the node runs behind a NAT.
+* **Fast Recovery**: in case of a node failure, it can reconnect to previously discovered nodes without issuing ping or query messages.
 * **Configurable**: the behavior of the node is highly configurable via a JSON file. A user can set peer limits, timeouts, blacklist peers, craweling behavior and more.
 
 Version
@@ -34,7 +35,12 @@ CSEtella uses a number of open source projects to work properly:
 Installation
 -
 
-TODO
+```sh
+git clone https://github.com/itairos/CSEtella.git
+cd CSEtella
+make tools
+make start
+```
 
 Screenshots
 -
