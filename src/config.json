@@ -1,0 +1,58 @@
+{
+  "cache": {
+    "max": 5000,
+    "maxAge": 60000
+  },
+
+  "storage": {
+    "location": "./.CSEtellaDB"
+  },
+
+  "debug": {
+    "watchMemory": false
+  },
+
+  "logger": {
+    "file": {
+      "level": "info",
+      "filename": "csetella-node.log",
+      "colorize": false,
+      "json": false,
+      "maxsize": 52428800,
+      "maxFiles": 4
+    },
+    "console": {
+      "level": "warn",
+      "colorize": true
+    }
+  },
+
+  "monitor": {
+    "maxAgeInMsecs": 900000,
+    "timeout": 10000,
+    "serviceQueryInterval": 240000
+  },
+
+  "csetella": {
+    "preferredPort" : 58299,
+    "knownPeers": [ { "host" : "128.208.2.88", "port": 5002 } ],
+    "blacklistedPeers" : [ { "host" : "24.16.119.245", "port": "*" } ],
+    "maxPeers": 20,
+    "maxConnections": 35,
+    "maxPeerIdleTimeInMsec": 180000,
+    "pingIntervalInMsecs": 60000,
+    "queryIntervalInMsecs": 60000,
+    "connectionMaintenanceIntervalInMsecs": 60000,
+    "text": "Itai Rosenberger -- itairos [at] cs.washington.edu"
+  },
+
+  "crawler": {
+    "root": { "host" : "128.208.2.88", "port": 5002 },
+    "timeoutInMsec": 10000,
+    "refreshIntervalInMsecs": 60000
+  },
+
+  "webserver": {
+    "port" : 60800
+  }
+}

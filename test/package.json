@@ -1,0 +1,15 @@
+{
+  "name": "csetella-node-test",
+  "description": "Test module for csetella-node",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "mocha": "*",
+    "should": "*",
+    "underscore": "*",
+    "async": "*",
+    "winston": "*",
+    "moment": "*",
+    "node-uuid": "*"
+  }
+}

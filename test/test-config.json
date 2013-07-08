@@ -1,0 +1,43 @@
+{
+  "cache": {
+    "max": 5000,
+    "maxAge": 60000
+  },
+
+  "storage": {
+    "location": "./.testdb"
+  },
+
+  "logger": {
+    "file": {
+      "level": "debug",
+      "filename": "csetella-node-test.log",
+      "colorize": false,
+      "json": false
+    },
+    "console": {
+      "level": "debug",
+      "colorize": true
+    }
+  },
+
+  "monitor": {
+    "maxAgeInMsecs": 900000,
+    "timeout": 10000,
+    "serviceQueryInterval": 240000
+  },
+
+  "csetella": {
+    "preferredPort" : 58299,
+    "knownPeers": [],
+    "maxPeers": 5,
+    "pingIntervalInMsecs": 600000,
+    "queryIntervalInMsecs": 600000,
+    "connectIntervalInMsecs": 600000,
+    "text": "Node#"
+  },
+
+  "webserver": {
+    "port" : 60800
+  }
+}

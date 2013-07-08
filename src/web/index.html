@@ -1,0 +1,189 @@
+<!--
+  index.html
+  Web application for monitoring a local CSEtella node.
+  Itai Rosenberger (itairos@cs.washington.edu)
+  
+  CSEP552 Assignment #3
+  http://www.cs.washington.edu/education/courses/csep552/13sp/assignments/a3.html
+-->
+<!DOCTYPE html>
+<html lang="en" ng-app>
+  <head>
+    <meta charset="utf-8">
+    <title>CSEtella &middot; Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 20px;
+        padding-bottom: 40px;
+      }
+
+      /* Custom container */
+      .container-narrow {
+        margin: 0 auto;
+        max-width: 700px;
+      }
+      .container-narrow > hr {
+        margin: 30px 0;
+      }
+
+      /* Supporting marketing content */
+      .marketing {
+        margin: 60px 0;
+      }
+      .marketing p + h4 {
+        margin-top: 28px;
+      }
+
+      .widget {
+        text-align: center;
+      }
+
+    </style>
+
+  </head>
+
+  <body ng-controller="CSEtellaNodeController">
+
+    <div class="container-narrow">
+
+      <div class="masthead">
+        <ul class="nav nav-pills pull-right">
+          <li class="active"><a href="index.html">Dashboard</a></li>
+          <li><a href="topology.html">Topology</a></li>
+        </ul>
+        <h3 class="muted">CSEtella Monitor</h3>
+      </div>
+
+      <hr>
+
+      <h4><i class="icon-signal icon-large"></i> Quick Stats</h4>
+      <div class="row-fluid">
+        <div class="span3 widget well well-small">
+          <h4>Uptime</h4>
+          <h3>{{nodeStatus.uptime}}</h3><i class="icon-refresh icon-spin" ng-show="!nodeStatus"></i>
+        </div>
+        <div class="span3 widget well well-small">
+          <h4>Peers</h4>
+          <h3>{{nodeStatus.server.peers.length}}</h3><i class="icon-refresh icon-spin" ng-show="!nodeStatus"></i>
+        </div>
+        <div class="span3 widget well well-small">
+          <h4>Sent</h4>
+          <h3>{{nodeStatus.totalSent}}</h3><i class="icon-refresh icon-spin" ng-show="!nodeStatus"></i>
+        </div>
+        <div class="span3 widget well well-small">
+          <h4>Received</h4>
+          <h3>{{nodeStatus.totalReceived}}</h3><i class="icon-refresh icon-spin" ng-show="!nodeStatus"></i>
+        </div>
+      </div>
+
+      <div class="row-fluid" ng-show="nodeStatus">
+        <div class="span12">
+          <h4><i class="icon-user icon-large"></i> Connected Peers</h4>
+          <table class="table table-striped">
+            <tr>
+              <th>IP</th>
+              <th>Port</th>
+              <th>Duration</th>
+              <th>Text</th>
+            </tr>
+            <tr ng-repeat="peer in nodeStatus.server.peers">
+              <td>{{peer.host}}</td>
+              <td>{{peer.port}}</td>
+              <td>{{peer.connectedFor}}</td>
+              <td>{{peer.name}}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="row-fluid" ng-show="nodeStatus">
+        <div class="span12">
+          <h4><i class="icon-envelope icon-large"></i> Messages</h4>
+          <table class="table table-striped">
+            <tr>
+              <th/>
+              <th>Sent</th>
+              <th>Received</th>
+            </tr>
+            <tr>
+              <th>Ping</th>
+              <td>{{nodeStatus.sent.pings}}</td>
+              <td>{{nodeStatus.received.pings}}</td>
+            </tr>
+            <tr>
+              <th>Pong</th>
+              <td>{{nodeStatus.sent.pongs}}</td>
+              <td>{{nodeStatus.received.pongs}}</td>
+            </tr>
+            <tr>
+              <th>Query</th>
+              <td>{{nodeStatus.sent.queries}}</td>
+              <td>{{nodeStatus.received.queries}}</td>
+            </tr>
+            <tr>
+              <th>Reply</th>
+              <td>{{nodeStatus.sent.replies}}</td>
+              <td>{{nodeStatus.received.replies}}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="row-fluid" ng-show="nodeStatus">
+        <div class="span12">
+          <h4><i class="icon-search icon-large"></i> Discovered Peers</h4>
+          <table class="table table-striped">
+            <tr>
+              <th>Host</th>
+              <th>IP</th>
+              <th>Port</th>
+              <th>Last Seen</th>
+            </tr>
+            <tr ng-repeat="peer in nodeStatus.store.discoveredPeers">
+              <td>{{peer.hostname}}</td>
+              <td>{{peer.host}}</td>
+              <td>{{peer.port}}</td>
+              <td>{{peer.lastSeen}}</td>
+            </tr>
+          </table>
+        </div>
+
+      </div>
+
+      <div class="row-fluid" ng-show="nodeStatus">
+
+        <div class="span12">
+          <h4><i class="icon-share icon-large"></i> Shared Texts</h4>
+          <ul>
+            <li ng-repeat="text in nodeStatus.store.texts">
+              {{text}}
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <hr>
+
+      <div class="footer">
+        <p>&copy; Itai Rosenberger 2013</p>
+      </div>
+
+    </div> <!-- /container -->
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+    <script src="index.js"></script>
+  </body>
+</html>

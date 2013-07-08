@@ -1,0 +1,21 @@
+{
+  "name": "csetella-node",
+  "description": "CSEtella node.js binding",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "uuid": "*",
+    "underscore": "*",
+    "coffee-script": "*",
+    "lru-cache":  "*",
+    "winston": "*",
+    "commander": "*",
+    "request": "*",
+    "moment": "*",
+    "async": "*",
+    "levelup": "*",
+    "leveldown": "*",
+    "express": "*",
+    "memwatch": "*"
+  }
+}

@@ -1,0 +1,236 @@
+<!--
+  topology.html
+  Web application for monitoring the topology of the CSEtella network.
+  Itai Rosenberger (itairos@cs.washington.edu)
+  
+  CSEP552 Assignment #3
+  http://www.cs.washington.edu/education/courses/csep552/13sp/assignments/a3.html
+-->
+<!DOCTYPE html>
+<html lang="en" ng-app>
+  <head>
+    <meta charset="utf-8">
+    <title>CSEtella &middot; Topology</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+    <link href="http://netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 20px;
+        padding-bottom: 40px;
+      }
+
+      svg {
+        background-color: rgb(37,39,33);
+      }
+
+      /* Custom container */
+      .container-narrow {
+        margin: 0 auto;
+        max-width: 700px;
+      }
+      .container-narrow > hr {
+        margin: 30px 0;
+      }
+
+      .widget {
+        text-align: center;
+      }
+
+      .link {
+        stroke: #ccc;
+        stroke-width: 4;
+      }
+
+      .node text {
+        pointer-events: none;
+        font: 18px sans-serif;
+      }
+
+    </style>
+
+  </head>
+
+  <body id="topology-controller" ng-controller="CSEtellaTopologyController">
+
+    <div class="container-narrow">
+
+      <div class="masthead">
+        <ul class="nav nav-pills pull-right">
+          <li><a href="index.html">Dashboard</a></li>
+          <li class="active"><a href="topology.html">Topology</a></li>
+        </ul>
+        <h3 class="muted">CSEtella Monitor</h3>
+      </div>
+
+      <hr>
+
+      <div class="alert alert-info" ng-show="topology.nodes.length">
+        <strong>Last Updated:</strong> {{topology.lastUpdated}}
+      </div>
+      <div class="alert" ng-show="!topology.nodes.length">
+        <strong>Crawler is still running!</strong> The page will refresh automatically.
+      </div>
+      <div class="row-fluid">
+        <div id="topology-container" class="span12">
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="footer">
+        <p>&copy; Itai Rosenberger 2013</p>
+      </div>
+
+    </div> <!-- /container -->
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+    <script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="./topology-controller.js"></script>
+    <script>
+
+    function getRandomNumber (min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    var imageNumber = 0;
+    function randomImage() {
+      return "images/" + (imageNumber++ % 11) + ".png";
+    }
+
+    function randomColor() {
+      return '#'+Math.floor(Math.random()*16777215).toString(16);
+    }
+
+    function updateTopologyCanvasSize() {
+      var w = $("#topology-container").width();
+      $("svg").width(w);
+    }
+
+    function getTopologyCanvasSize() {
+      return { "width": $("svg").width(), "height": $("svg").height() }
+    }
+
+    function createTopologyCanvas(height) {
+
+      var width = $("#topology-container").width();
+      return d3.select("#topology-container").append("svg")
+        .attr("width", width)
+        .attr("height", height);
+    }
+
+    var canvas = createTopologyCanvas(600);
+    var topologyJson = null;
+
+    // Converts the topology to the d3 format
+    function convertTopologyToD3Topology(topology) {
+
+      var d3Topology = { nodes: [], links: [] }
+      for (var i = topology.nodes.length - 1; i >= 0; i--) {
+        d3Topology.nodes.push({ "name": topology.nodes[i] });
+      };
+
+      for (var i = topology.edges.length - 1; i >= 0; i--) {
+        vertices = topology.edges[i].split('->')
+        if (vertices.length != 2) {
+          continue;
+        }
+
+        v = vertices[0];
+        vi = topology.nodes.indexOf(v);
+        u = vertices[1];
+        ui = topology.nodes.indexOf(u);
+        d3Topology.links.push({ "source": vi, "target": ui, "value": 1})
+      };
+
+      return d3Topology;
+    }
+
+    function watchTopologyChanges() {
+      angular.element(document.getElementById('topology-controller')).scope().$watch('topology',
+        function (newTopology, oldTopology) {
+          console.log("New Topology");
+          setTimeout(function () {
+            topologyJson = convertTopologyToD3Topology(newTopology);
+            renderTopology(canvas, topologyJson);
+          }, 1000);
+          
+        }
+      );
+    }
+
+    $(document).ready(function(){
+
+      watchTopologyChanges();
+      updateTopologyCanvasSize();
+    });
+
+    $(window).resize(function () {
+      
+      // Make the canvas responsive.
+      updateTopologyCanvasSize();
+      renderTopology(canvas, topologyJson);
+    }).resize();
+
+    function renderTopology(canvas, json) {
+      
+      if (!json) {
+        return;
+      }
+
+      var topologyCanvasSize = getTopologyCanvasSize();
+      var force = d3.layout.force()
+        .gravity(.05)
+        .distance(200)
+        .charge(-500)
+        .size([topologyCanvasSize.width, topologyCanvasSize.height]);
+
+      force.nodes(json.nodes)
+        .links(json.links)
+        .start();
+
+      var link = canvas.selectAll(".link")
+        .data(json.links)
+        .enter().append("line")
+        .attr("class", "link");
+
+      var node = canvas.selectAll(".node")
+        .data(json.nodes)
+        .enter().append("g")
+        .attr("class", "node")
+        .call(force.drag);
+
+      node.append("image")
+        .attr("xlink:href", randomImage)
+        .attr("x", -32)
+        .attr("y", -32)
+        .attr("width", 64)
+        .attr("height", 64);
+
+      node.append("text")
+          .attr("dx", 12)
+          .attr("dy", ".35em")
+          .attr("fill", randomColor)
+          .text(function(d) { return d.name });
+
+      force.on("tick", function() {
+        link.attr("x1", function(d) { return d.source.x; })
+            .attr("y1", function(d) { return d.source.y; })
+            .attr("x2", function(d) { return d.target.x; })
+            .attr("y2", function(d) { return d.target.y; });
+
+        node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+      });
+    }
+    </script>
+  </body>
+</html>
